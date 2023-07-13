@@ -11,7 +11,9 @@
 3. batch的数据：一个batch数据中，前一半全部是chosen的句子，后一半全部是rejected的句子；而且i条和i+bs/2条的prompt是一样的，answer正好是一正一负，对应的两条数据组成一对计算pairwise损失。
 4. 损失计算：一对数据(chosen_seq,rejected_seq)计算一次损失，chosen_seq的answer对应的reward - rejected_seq的answer对应的reward,取平均值，使用logsigmoid转换成损失。
 5. 注意：这里实现和instruct-gpt上说的同一个prompt的K个answer，任意两个组成一个样本计算损失不一样（这样就有了 $C_k^{2}$个样本）。为了解决论文中提到的，一个seq和多个对应seq组合而被训练多次导致过拟合的问题，猜测这里的一个batch里面都是相同的prompt组成的，这样的梯度对一条数据只更新了一次。
+
 ![Alt text](image-13.png)
+
 ![Alt text](image-14.png)
 
 ## 第三步RLHF reinforce learning from human feedback. 
