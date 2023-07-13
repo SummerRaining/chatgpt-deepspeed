@@ -35,6 +35,7 @@
     - values : critic_model输入seq前推得到[bs,seq_len].
     - 注意这一步所有计算的变量都被detach了，不计算梯度。
     - actor_model和ref_model都是SFT后的模型初始化得到；critical和reward都是由第二步reward训练后的模型初始化。
+
     ![Alt text](image.png) 
 
 
@@ -53,7 +54,9 @@ prompt的长度作为answer计算的起点(只有一个长度),mask后移一位�
     - for循环lastgaelam计算代表：$\hat{A_t} = \delta_t+\gamma \lambda*\hat{A}_{t-1}$，依次迭代得到的结果和第一个公式等价。
     - 由于定义中advantage值是return值减去 value值，所以return由advantage + value获得(不懂). 对应最后一步计算returns.
     - advantage dims:[bs,seq_len],values:[bs,seq_len]
+      
 ![Alt text](image-4.png)
+
 ![Alt text](image-5.png)
 
 3. 得到advantages和returns后，计算PPO的objective function.
@@ -62,8 +65,9 @@ prompt的长度作为answer计算的起点(只有一个长度),mask后移一位�
     - ratio代表$r_{t}(\theta)$,
     - cliprange代表$\epsilon$
     - actor_loss_fn正是第二个公式PPO objective的实现。
-    ![Alt text](image-7.png)
-    ![code compute ppo loss](image-6.png)
+
+![Alt text](image-7.png)   
+![code compute ppo loss](image-6.png)
 
 ### 4 critic_loss计算
 使用values来逼近return,同样使用old_values(critic_model在外层循环提前生成的向量)对values进行clip，防止差异过大。loss等于clip_value-return的差的平方和损失。对应公式中的第二项，为了避免reward模型的过度优化。
